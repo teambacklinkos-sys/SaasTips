@@ -85,7 +85,7 @@ export default function AdminPanelPage() {
         <div className="mb-8">
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition cursor-pointer active:bg-blue-800"
           >
             <Plus size={20} />
             Create New Blog
