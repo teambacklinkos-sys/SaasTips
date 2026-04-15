@@ -10,11 +10,8 @@ export async function fetchCategories() {
 }
 
 export async function fetchBlogs() {
-  const { data, error } = await supabase.from('blogs').select('*').order('id', { ascending: false });
-  if (error) {
-    console.error('Error fetching blogs:', error);
-    return [];
-  }
+  const { data, error } = await supabase.from('blogs').select('*').order('created_at', { ascending: false });
+  if (error) throw new Error(error.message);
   return data || [];
 }
 

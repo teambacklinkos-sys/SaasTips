@@ -24,7 +24,7 @@ export default function AdminPanelPage() {
       setBlogs(data);
     } catch (err) {
       console.error('Error loading blogs:', err);
-      setError('Failed to load blogs. Check your Supabase connection.');
+      setError(err?.message || 'Failed to load blogs. Check your Supabase connection.');
     } finally {
       setLoading(false);
     }
