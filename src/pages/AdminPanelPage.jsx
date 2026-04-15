@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAdminAuth } from '../context/AdminAuthContext';
-import { LogOut, Plus, Trash2, Edit2, Eye } from 'lucide-react';
+import { Plus, Trash2, Edit2, Eye } from 'lucide-react';
 import CreateBlogModal from '../components/modals/CreateBlogModal';
 import EditBlogModal from '../components/modals/EditBlogModal';
 import { fetchBlogs, createBlog, updateBlog, deleteBlog } from '../lib/api';
 
 export default function AdminPanelPage() {
-  const { logout } = useAdminAuth();
-  const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -62,29 +58,13 @@ export default function AdminPanelPage() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    navigate('/admin');
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Blog Manager</h1>
-              <p className="text-gray-600 mt-1">Create, edit, and manage your blog posts</p>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 px-4 py-2 rounded-lg transition border border-red-200"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Blog Manager</h1>
+          <p className="text-gray-600 mt-1">Create, edit, and manage your blog posts</p>
         </div>
       </div>
 
