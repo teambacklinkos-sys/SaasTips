@@ -1,28 +1,23 @@
 import { useState } from 'react';
-import { X, Star } from 'lucide-react';
+import { X } from 'lucide-react';
 import Modal from '../ui/Modal';
 
-const CATEGORIES = ['growth', 'marketing', 'product', 'pricing', 'retention', 'analytics', 'tools'];
+const CATEGORIES = ['Technology', 'Business', 'Design', 'Marketing', 'Development', 'Other'];
 
 export default function CreateBlogModal({ onClose, onCreate }) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     content: '',
-    category: 'growth',
+    category: 'Technology',
     author: '',
-    authorRole: '',
-    image: '',
-    featured: false
+    image: ''
   });
   const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: type === 'checkbox' ? checked : value 
-    }));
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -48,10 +43,10 @@ export default function CreateBlogModal({ onClose, onCreate }) {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal open={true} onClose={onClose}>
       <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
           <h2 className="text-2xl font-bold text-gray-900">Create New Blog</h2>
           <button
             onClick={onClose}
@@ -81,7 +76,7 @@ export default function CreateBlogModal({ onClose, onCreate }) {
           {/* Description */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Description / Excerpt *
+              Description *
             </label>
             <textarea
               name="description"
@@ -96,97 +91,63 @@ export default function CreateBlogModal({ onClose, onCreate }) {
           {/* Content */}
           <div>
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Content * (Markdown-like text)
+              Content *
             </label>
             <textarea
               name="content"
               value={formData.content}
               onChange={handleChange}
-              placeholder="Write your article content here..."
-              rows="8"
+              placeholder="Full blog content"
+              rows="6"
               className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Category */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 capitalize"
-              >
-                {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            {/* Image URL */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Image URL
-              </label>
-              <input
-                type="url"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Category
+            </label>
+            <select
+              name="category"
+              value={formData.category}
+              onChange={handleChange}
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {/* Author */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Author
-              </label>
-              <input
-                type="text"
-                name="author"
-                value={formData.author}
-                onChange={handleChange}
-                placeholder="Author name"
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-            
-            {/* Author Role */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Author Role
-              </label>
-              <input
-                type="text"
-                name="authorRole"
-                value={formData.authorRole}
-                onChange={handleChange}
-                placeholder="e.g. Founder, Writer"
-                className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
+          {/* Author */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Author
+            </label>
+            <input
+              type="text"
+              name="author"
+              value={formData.author}
+              onChange={handleChange}
+              placeholder="Author name"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-          
-          {/* Featured Toggle */}
-          <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
-             <input 
-               type="checkbox" 
-               id="featured" 
-               name="featured" 
-               checked={formData.featured}
-               onChange={handleChange}
-               className="w-5 h-5 text-blue-600 rounded"
-             />
-             <label htmlFor="featured" className="flex items-center gap-2 font-semibold text-gray-900 cursor-pointer">
-               <Star size={18} className={formData.featured ? 'text-amber-500 fill-amber-500' : 'text-gray-400'} />
-               Feature this post on the homepage
-             </label>
+
+          {/* Image URL */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
+              Image URL
+            </label>
+            <input
+              type="url"
+              name="image"
+              value={formData.image}
+              onChange={handleChange}
+              placeholder="https://example.com/image.jpg"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
 
           {/* Buttons */}
