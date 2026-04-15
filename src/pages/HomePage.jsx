@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { SlidersHorizontal, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
-import CategoryFilter from '../components/CategoryFilter';
 import BlogCard from '../components/BlogCard';
 import NewsletterBanner from '../components/NewsletterBanner';
 import Footer from '../components/Footer';
@@ -27,15 +26,21 @@ export default function HomePage({ onOpenSearch }) {
 
   useEffect(() => {
     async function loadData() {
-      const [fetchedBlogs, fetchedCategories] = await Promise.all([
-        fetchBlogs(),
-        fetchCategories(),
-      ]);
-      setBlogs(fetchedBlogs);
-      
-      // Merge with static 'all' category
-      setCategories([{ id: 'all', label: 'All Posts', color: 'bg-surface-50 text-surface-700' }, ...fetchedCategories]);
-      setLoading(false);
+      try {
+        const [fetchedBlogs, fetchedCategories] = await Promise.all([
+          fetchBlogs(),
+          fetchCategories(),
+        ]);
+        setBlogs(fetchedBlogs);
+        setCategories([{ id: 'all', label: 'All Posts', color: 'bg-surface-50 text-surface-700' }, ...fetchedCategories]);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        // Fallback already handled inside fetchBlogs/fetchCategories
+        setBlogs([]);
+        setCategories([{ id: 'all', label: 'All Posts', color: 'bg-surface-50 text-surface-700' }]);
+      } finally {
+        setLoading(false);
+      }
     }
     loadData();
   }, []);

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus, Trash2, Edit2, Eye, FileText, AlertCircle, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, Edit2, Eye, FileText, RefreshCw, WifiOff } from 'lucide-react';
 import CreateBlogModal from '../components/modals/CreateBlogModal';
 import EditBlogModal from '../components/modals/EditBlogModal';
-import { fetchBlogs, createBlog, updateBlog, deleteBlog } from '../lib/api';
+import { createBlog, updateBlog, deleteBlog } from '../lib/api';
+import { supabase } from '../lib/supabase';
 
 export default function AdminPanelPage() {
   const [blogs, setBlogs] = useState([]);
@@ -20,11 +21,14 @@ export default function AdminPanelPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchBlogs();
-      setBlogs(data);
+      const { data, error: sbError } = await supabase
+        .from('blogs')
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (sbError) throw new Error(sbError.message);
+      setBlogs(data || []);
     } catch (err) {
-      console.error('Error loading blogs:', err);
-      setError(err?.message || 'Failed to load blogs. Check your Supabase connection.');
+      setError(err.message || 'Could not connect to Supabase.');
     } finally {
       setLoading(false);
     }
@@ -49,8 +53,7 @@ export default function AdminPanelPage() {
         await deleteBlog(id);
         await loadBlogs();
       } catch (err) {
-        console.error('Error deleting blog:', err);
-        alert('Failed to delete blog. Please try again.');
+        alert('Failed to delete: ' + err.message);
       }
     }
   };
@@ -66,7 +69,7 @@ export default function AdminPanelPage() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-slate-900 leading-tight">Blog Manager</h1>
-              <p className="text-xs text-slate-500">{blogs.length} post{blogs.length !== 1 ? 's' : ''} published</p>
+              <p className="text-xs text-slate-500">{blogs.length} post{blogs.length !== 1 ? 's' : ''} in database</p>
             </div>
           </div>
           <button
@@ -84,22 +87,27 @@ export default function AdminPanelPage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-3">
             <div className="w-8 h-8 border-[3px] border-blue-600 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm text-slate-500">Loading posts...</p>
+            <p className="text-sm text-slate-500">Connecting to database...</p>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 flex items-start gap-4">
-            <AlertCircle size={20} className="text-red-500 mt-0.5 shrink-0" />
-            <div className="flex-1">
-              <p className="font-semibold text-red-800">Connection Error</p>
-              <p className="text-sm text-red-600 mt-1">{error}</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <WifiOff size={20} className="text-red-500 mt-0.5 shrink-0" />
+              <div className="flex-1">
+                <p className="font-semibold text-red-800">Supabase Connection Error</p>
+                <p className="text-sm text-red-600 mt-1 font-mono bg-red-100 px-3 py-2 rounded mt-2">{error}</p>
+                <p className="text-xs text-red-500 mt-3">
+                  Make sure your Supabase URL and anon key are set correctly in Vercel environment variables, and the <code className="bg-red-100 px-1 rounded">blogs</code> table exists.
+                </p>
+              </div>
+              <button
+                onClick={loadBlogs}
+                className="flex items-center gap-1.5 text-sm font-medium text-red-700 hover:text-red-900 transition-colors shrink-0"
+              >
+                <RefreshCw size={14} />
+                Retry
+              </button>
             </div>
-            <button
-              onClick={loadBlogs}
-              className="flex items-center gap-1.5 text-sm font-medium text-red-700 hover:text-red-900 transition-colors"
-            >
-              <RefreshCw size={14} />
-              Retry
-            </button>
           </div>
         ) : blogs.length === 0 ? (
           <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-16 text-center">
@@ -124,7 +132,6 @@ export default function AdminPanelPage() {
                 className="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 hover:shadow-sm transition-all group"
               >
                 <div className="flex items-center gap-4">
-                  {/* Thumbnail */}
                   {blog.image ? (
                     <img
                       src={blog.image}
@@ -138,7 +145,6 @@ export default function AdminPanelPage() {
                     </div>
                   )}
 
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-semibold text-slate-900 truncate">{blog.title}</h3>
@@ -149,13 +155,10 @@ export default function AdminPanelPage() {
                     <p className="text-sm text-slate-500 mt-0.5 line-clamp-1">{blog.excerpt}</p>
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-slate-400">
                       {blog.author && <span>By {blog.author}</span>}
-                      {blog.author && blog.date && <span>·</span>}
-                      {blog.date && <span>{blog.date}</span>}
-                      {blog.readTime && <><span>·</span><span>{blog.readTime}</span></>}
+                      {blog.date && <><span>·</span><span>{blog.date}</span></>}
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => { setSelectedBlog(blog); setShowEditModal(true); }}

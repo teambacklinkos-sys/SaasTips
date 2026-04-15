@@ -1,16 +1,22 @@
 import { useState } from 'react';
 import { X, ImageIcon, User, Tag, AlignLeft, Type, Loader2 } from 'lucide-react';
 
-const CATEGORIES = ['Technology', 'Business', 'Design', 'Marketing', 'Development', 'Other'];
+const CATEGORIES = [
+  { id: 'growth', label: 'Growth' },
+  { id: 'marketing', label: 'Marketing' },
+  { id: 'product', label: 'Product' },
+  { id: 'pricing', label: 'Pricing' },
+  { id: 'retention', label: 'Retention' },
+  { id: 'analytics', label: 'Analytics' },
+  { id: 'tools', label: 'Tools' },
+];
 
 export default function EditBlogModal({ blog, onClose, onUpdate }) {
   const [formData, setFormData] = useState({
     title: blog.title || '',
     description: blog.excerpt || blog.description || '',
     content: (blog.body?.[0]?.text) || blog.content || '',
-    category: blog.category
-      ? blog.category.charAt(0).toUpperCase() + blog.category.slice(1)
-      : 'Technology',
+    category: blog.category?.toLowerCase() || 'growth',
     author: blog.author || '',
     image: blog.image || ''
   });
@@ -138,7 +144,7 @@ export default function EditBlogModal({ blog, onClose, onUpdate }) {
                 className="w-full px-4 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
               >
                 {CATEGORIES.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
+                  <option key={cat.id} value={cat.id}>{cat.label}</option>
                 ))}
               </select>
             </div>

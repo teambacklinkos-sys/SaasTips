@@ -1,33 +1,44 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, X, Clock, ArrowUpRight } from 'lucide-react';
-import { blogs, getCategoryMeta } from '../../data/blogs';
+import { Search, X, Clock, ArrowUpRight, Loader2 } from 'lucide-react';
+import { getCategoryMeta } from '../../data/blogs';
+import { fetchBlogs } from '../../lib/api';
 
 export default function SearchOverlay({ open, onClose }) {
   const [query, setQuery] = useState('');
+  const [allBlogs, setAllBlogs] = useState([]);
+  const [loadingBlogs, setLoadingBlogs] = useState(false);
+
+  // Load blogs when overlay opens
+  useEffect(() => {
+    if (!open) { setQuery(''); return; }
+    if (allBlogs.length > 0) return; // already loaded
+    setLoadingBlogs(true);
+    fetchBlogs().then((data) => {
+      setAllBlogs(data);
+      setLoadingBlogs(false);
+    });
+  }, [open]);
 
   // Close on Escape
   useEffect(() => {
     if (!open) return;
-    const handler = (e) => { if (e.key === 'Escape') { onClose(); setQuery(''); } };
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [open, onClose]);
 
-  // Reset query when overlay closes
-  useEffect(() => { if (!open) setQuery(''); }, [open]);
-
   const results = useMemo(() => {
-    if (!query.trim()) return blogs.slice(0, 6); // show recent when no query
+    if (!query.trim()) return allBlogs.slice(0, 6);
     const q = query.toLowerCase();
-    return blogs.filter(
+    return allBlogs.filter(
       (b) =>
-        b.title.toLowerCase().includes(q) ||
-        b.excerpt.toLowerCase().includes(q) ||
-        b.tags.some((t) => t.toLowerCase().includes(q)) ||
-        b.author.toLowerCase().includes(q)
+        b.title?.toLowerCase().includes(q) ||
+        b.excerpt?.toLowerCase().includes(q) ||
+        b.tags?.some((t) => t.toLowerCase().includes(q)) ||
+        b.author?.toLowerCase().includes(q)
     );
-  }, [query]);
+  }, [query, allBlogs]);
 
   if (!open) return null;
 
@@ -51,7 +62,7 @@ export default function SearchOverlay({ open, onClose }) {
             </button>
           )}
           <button
-            onClick={() => { onClose(); setQuery(''); }}
+            onClick={onClose}
             className="ml-1 flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-700 transition bg-slate-100 px-3 py-1.5 rounded-lg"
           >
             <X size={13} /> Esc
@@ -64,7 +75,11 @@ export default function SearchOverlay({ open, onClose }) {
 
       {/* Results */}
       <div className="flex-1 overflow-y-auto max-w-3xl mx-auto w-full px-4 pb-8">
-        {results.length === 0 ? (
+        {loadingBlogs ? (
+          <div className="flex justify-center py-20 text-blue-500">
+            <Loader2 size={32} className="animate-spin" />
+          </div>
+        ) : results.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-5xl mb-3">🔍</div>
             <p className="text-lg font-semibold text-slate-700">No results for &ldquo;{query}&rdquo;</p>
@@ -78,27 +93,34 @@ export default function SearchOverlay({ open, onClose }) {
                 <Link
                   key={blog.id}
                   to={`/blog/${blog.id}`}
-                  onClick={() => { onClose(); setQuery(''); }}
+                  onClick={onClose}
                   className="group flex items-center gap-4 bg-white border border-slate-200 rounded-xl px-5 py-4 hover:border-blue-300 hover:shadow-md transition"
                 >
-                  <img
-                    src={blog.image}
-                    alt={blog.title}
-                    className="w-14 h-14 rounded-lg object-cover shrink-0 bg-slate-100"
-                  />
+                  {blog.image ? (
+                    <img
+                      src={blog.image}
+                      alt={blog.title}
+                      className="w-14 h-14 rounded-lg object-cover shrink-0 bg-slate-100"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  ) : (
+                    <div className="w-14 h-14 rounded-lg bg-slate-100 shrink-0" />
+                  )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${cat.color}`}>
                         {cat.label}
                       </span>
-                      <span className="flex items-center gap-1 text-xs text-slate-400">
-                        <Clock size={10} /> {blog.readTime}
-                      </span>
+                      {blog.readTime && (
+                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <Clock size={10} /> {blog.readTime}
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm font-semibold text-slate-900 group-hover:text-blue-700 transition truncate">
                       {blog.title}
                     </p>
-                    <p className="text-xs text-slate-400 mt-0.5">{blog.author} · {blog.date}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{blog.author}{blog.date ? ` · ${blog.date}` : ''}</p>
                   </div>
                   <ArrowUpRight size={16} className="text-slate-300 group-hover:text-blue-500 shrink-0 transition" />
                 </Link>
