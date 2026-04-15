@@ -44,13 +44,13 @@ export default function CreateBlogModal({ onClose, onCreate }) {
 
   return (
     <Modal onClose={onClose}>
-      <div className="bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-700 sticky top-0 bg-slate-800">
-          <h2 className="text-2xl font-bold text-white">Create New Blog</h2>
+        <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
+          <h2 className="text-2xl font-bold text-gray-900">Create New Blog</h2>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition"
+            className="text-gray-400 hover:text-gray-600 transition"
           >
             <X size={24} />
           </button>
@@ -60,7 +60,7 @@ export default function CreateBlogModal({ onClose, onCreate }) {
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Title *
             </label>
             <input
@@ -69,13 +69,13 @@ export default function CreateBlogModal({ onClose, onCreate }) {
               value={formData.title}
               onChange={handleChange}
               placeholder="Enter blog title"
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Description *
             </label>
             <textarea
@@ -84,13 +84,13 @@ export default function CreateBlogModal({ onClose, onCreate }) {
               onChange={handleChange}
               placeholder="Short description"
               rows="3"
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Content */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Content *
             </label>
             <textarea
@@ -99,20 +99,20 @@ export default function CreateBlogModal({ onClose, onCreate }) {
               onChange={handleChange}
               placeholder="Full blog content"
               rows="6"
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Category
             </label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {CATEGORIES.map(cat => (
                 <option key={cat} value={cat}>{cat}</option>
@@ -122,7 +122,7 @@ export default function CreateBlogModal({ onClose, onCreate }) {
 
           {/* Author */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Author
             </label>
             <input
@@ -131,13 +131,13 @@ export default function CreateBlogModal({ onClose, onCreate }) {
               value={formData.author}
               onChange={handleChange}
               placeholder="Author name"
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
           {/* Image URL */}
           <div>
-            <label className="block text-sm font-medium text-slate-200 mb-2">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Image URL
             </label>
             <input
@@ -146,7 +146,7 @@ export default function CreateBlogModal({ onClose, onCreate }) {
               value={formData.image}
               onChange={handleChange}
               placeholder="https://example.com/image.jpg"
-              className="w-full px-4 py-2 bg-slate-700/50 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -155,14 +155,14 @@ export default function CreateBlogModal({ onClose, onCreate }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition"
+              className="flex-1 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg transition font-semibold"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded-lg transition font-semibold"
+              className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition font-semibold"
             >
               {isLoading ? 'Creating...' : 'Create Blog'}
             </button>

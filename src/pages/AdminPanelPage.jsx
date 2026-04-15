@@ -59,18 +59,18 @@ export default function AdminPanelPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-slate-800/50 border-b border-slate-700 sticky top-0 z-40">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-white">Blog Manager</h1>
-              <p className="text-slate-400 mt-1">Create, edit, and manage your blog posts</p>
+              <h1 className="text-3xl font-bold text-gray-900">Blog Manager</h1>
+              <p className="text-gray-600 mt-1">Create, edit, and manage your blog posts</p>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 px-4 py-2 rounded-lg transition"
+              className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-700 px-4 py-2 rounded-lg transition border border-red-200"
             >
               <LogOut size={18} />
               Logout
@@ -98,21 +98,21 @@ export default function AdminPanelPage() {
             <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : blogs.length === 0 ? (
-          <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-12 text-center">
-            <p className="text-slate-400 text-lg">No blogs yet. Create your first blog post!</p>
+          <div className="bg-white border border-gray-200 rounded-lg p-12 text-center">
+            <p className="text-gray-600 text-lg">No blogs yet. Create your first blog post!</p>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-4">
             {blogs.map((blog) => (
               <div
                 key={blog.id}
-                className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 hover:border-slate-600 transition"
+                className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 hover:shadow-md transition"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-white mb-2">{blog.title}</h3>
-                    <p className="text-slate-400 line-clamp-2 mb-4">{blog.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-slate-500">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">{blog.title}</h3>
+                    <p className="text-gray-600 line-clamp-2 mb-4">{blog.description}</p>
+                    <div className="flex items-center gap-4 text-sm text-gray-500">
                       <span>Category: {blog.category}</span>
                       <span>•</span>
                       <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
@@ -124,14 +124,14 @@ export default function AdminPanelPage() {
                         setSelectedBlog(blog);
                         setShowEditModal(true);
                       }}
-                      className="bg-slate-700 hover:bg-slate-600 text-blue-400 p-2 rounded-lg transition"
+                      className="bg-gray-100 hover:bg-gray-200 text-blue-600 p-2 rounded-lg transition border border-gray-300"
                       title="Edit"
                     >
                       <Edit2 size={18} />
                     </button>
                     <button
                       onClick={() => handleDeleteBlog(blog.id)}
-                      className="bg-slate-700 hover:bg-slate-600 text-red-400 p-2 rounded-lg transition"
+                      className="bg-gray-100 hover:bg-gray-200 text-red-600 p-2 rounded-lg transition border border-gray-300"
                       title="Delete"
                     >
                       <Trash2 size={18} />
@@ -140,7 +140,7 @@ export default function AdminPanelPage() {
                       href={`/blog/${blog.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-slate-700 hover:bg-slate-600 text-green-400 p-2 rounded-lg transition"
+                      className="bg-gray-100 hover:bg-gray-200 text-green-600 p-2 rounded-lg transition border border-gray-300"
                       title="View"
                     >
                       <Eye size={18} />
