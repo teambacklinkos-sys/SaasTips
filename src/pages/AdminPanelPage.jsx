@@ -4,6 +4,7 @@ import { useAdminAuth } from '../context/AdminAuthContext';
 import { LogOut, Plus, Trash2, Edit2, Eye } from 'lucide-react';
 import CreateBlogModal from '../components/modals/CreateBlogModal';
 import EditBlogModal from '../components/modals/EditBlogModal';
+import { fetchBlogs, createBlog, updateBlog, deleteBlog } from '../lib/api';
 
 export default function AdminPanelPage() {
   const { logout } = useAdminAuth();
@@ -15,41 +16,45 @@ export default function AdminPanelPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load blogs from localStorage (will replace with Supabase later)
     loadBlogs();
   }, []);
 
-  const loadBlogs = () => {
+  const loadBlogs = async () => {
     setLoading(true);
-    const storedBlogs = localStorage.getItem('blogs');
-    if (storedBlogs) {
-      setBlogs(JSON.parse(storedBlogs));
-    }
+    const data = await fetchBlogs();
+    setBlogs(data);
     setLoading(false);
   };
 
-  const handleCreateBlog = (newBlog) => {
-    const updatedBlogs = [...blogs, { ...newBlog, id: Date.now() }];
-    setBlogs(updatedBlogs);
-    localStorage.setItem('blogs', JSON.stringify(updatedBlogs));
-    setShowCreateModal(false);
+  const handleCreateBlog = async (newBlog) => {
+    try {
+      const created = await createBlog(newBlog);
+      setBlogs([created, ...blogs]);
+      setShowCreateModal(false);
+    } catch (e) {
+      alert("Failed to create blog. Make sure you've added the RLS insert permissions.");
+    }
   };
 
-  const handleUpdateBlog = (updatedBlog) => {
-    const updatedBlogs = blogs.map(blog => 
-      blog.id === updatedBlog.id ? updatedBlog : blog
-    );
-    setBlogs(updatedBlogs);
-    localStorage.setItem('blogs', JSON.stringify(updatedBlogs));
-    setShowEditModal(false);
-    setSelectedBlog(null);
+  const handleUpdateBlog = async (updatedBlogData) => {
+    try {
+      const updated = await updateBlog(updatedBlogData.id, updatedBlogData);
+      setBlogs(blogs.map(blog => blog.id === updated.id ? updated : blog));
+      setShowEditModal(false);
+      setSelectedBlog(null);
+    } catch (e) {
+      alert("Failed to update blog.");
+    }
   };
 
-  const handleDeleteBlog = (id) => {
+  const handleDeleteBlog = async (id) => {
     if (confirm('Are you sure you want to delete this blog?')) {
-      const updatedBlogs = blogs.filter(blog => blog.id !== id);
-      setBlogs(updatedBlogs);
-      localStorage.setItem('blogs', JSON.stringify(updatedBlogs));
+      try {
+        await deleteBlog(id);
+        setBlogs(blogs.filter(blog => blog.id !== id));
+      } catch (e) {
+        alert("Failed to delete blog. Check RLS delete permissions.");
+      }
     }
   };
 
@@ -82,7 +87,7 @@ export default function AdminPanelPage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Create Button */}
-        <div className="mb-8">
+        <div className="mb-8 flex items-center justify-between">
           <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition cursor-pointer active:bg-blue-800"
@@ -90,6 +95,7 @@ export default function AdminPanelPage() {
             <Plus size={20} />
             Create New Blog
           </button>
+          <span className="text-sm font-medium text-gray-500 bg-gray-200 px-3 py-1 rounded-full">{blogs.length} Articles</span>
         </div>
 
         {/* Blogs List */}
@@ -109,19 +115,24 @@ export default function AdminPanelPage() {
                 className="bg-white border border-gray-200 rounded-lg p-6 hover:border-gray-300 hover:shadow-md transition"
               >
                 <div className="flex items-start justify-between">
-                  <div className="flex-1">
+                  <div className="flex-1 pr-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{blog.title}</h3>
-                    <p className="text-gray-600 line-clamp-2 mb-4">{blog.description}</p>
+                    <p className="text-gray-600 line-clamp-2 mb-4">{blog.excerpt}</p>
                     <div className="flex items-center gap-4 text-sm text-gray-500">
-                      <span>Category: {blog.category}</span>
+                      <span className="font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded capitalize">{blog.category}</span>
                       <span>•</span>
-                      <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
+                      <span>{blog.date}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 ml-4">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => {
-                        setSelectedBlog(blog);
+                        // Adapt DB schema to modal form keys
+                        setSelectedBlog({
+                          ...blog,
+                          description: blog.excerpt,
+                          content: typeof blog.body === 'string' ? blog.body : (blog.body?.[0]?.text || '')
+                        });
                         setShowEditModal(true);
                       }}
                       className="bg-gray-100 hover:bg-gray-200 text-blue-600 p-2 rounded-lg transition border border-gray-300"
@@ -141,7 +152,7 @@ export default function AdminPanelPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-gray-100 hover:bg-gray-200 text-green-600 p-2 rounded-lg transition border border-gray-300"
-                      title="View"
+                      title="View Live"
                     >
                       <Eye size={18} />
                     </a>

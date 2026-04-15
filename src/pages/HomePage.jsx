@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Loader2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import CategoryFilter from '../components/CategoryFilter';
 import BlogCard from '../components/BlogCard';
 import NewsletterBanner from '../components/NewsletterBanner';
 import Footer from '../components/Footer';
-import { blogs } from '../data/blogs';
+import { fetchBlogs, fetchCategories } from '../lib/api';
 import { useToast } from '../context/ToastContext';
 
 const PAGE_SIZE = 6;
@@ -20,6 +20,25 @@ export default function HomePage({ onOpenSearch }) {
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [sortBy, setSortBy] = useState('newest');
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const [blogs, setBlogs] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      const [fetchedBlogs, fetchedCategories] = await Promise.all([
+        fetchBlogs(),
+        fetchCategories(),
+      ]);
+      setBlogs(fetchedBlogs);
+      
+      // Merge with static 'all' category
+      setCategories([{ id: 'all', label: 'All Posts', color: 'bg-surface-50 text-surface-700' }, ...fetchedCategories]);
+      setLoading(false);
+    }
+    loadData();
+  }, []);
 
   // Sync category from URL (e.g. footer links)
   useEffect(() => {
@@ -37,7 +56,7 @@ export default function HomePage({ onOpenSearch }) {
     }
     if (sortBy === 'oldest') result = [...result].reverse();
     return result;
-  }, [activeCategory, sortBy]);
+  }, [blogs, activeCategory, sortBy]);
 
   const featuredBlog = filtered.find((b) => b.featured);
   const restBlogs = filtered.filter((b) => !b.featured);
@@ -67,25 +86,30 @@ export default function HomePage({ onOpenSearch }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-[#FAFAFB]">
       <Navbar onOpenSearch={onOpenSearch} />
       <Hero />
 
-      <main id="blogs" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+      <main id="blogs" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative">
+        {/* Subtle background element */}
+        <div className="absolute top-40 right-[-10%] w-[30%] h-[30%] bg-brand-100/30 rounded-full blur-[100px] pointer-events-none" />
+
         {/* Section header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-10 relative z-10">
           <div>
-            <h2 className="text-2xl font-extrabold text-slate-900">Latest Articles</h2>
-            <p className="text-sm text-slate-500 mt-0.5">
-              {filtered.length} article{filtered.length !== 1 ? 's' : ''} found
+            <h2 className="text-3xl font-display font-bold text-surface-900 tracking-tight">Latest Journals</h2>
+            <p className="text-[15px] font-medium text-surface-500 mt-2">
+              {filtered.length} curated read{filtered.length !== 1 ? 's' : ''} for you
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal size={15} className="text-slate-400" />
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-9 h-9 rounded-full bg-white shadow-sm border border-surface-200 text-surface-400">
+              <SlidersHorizontal size={16} />
+            </div>
             <select
               value={sortBy}
               onChange={(e) => handleSortChange(e.target.value)}
-              className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300 cursor-pointer"
+              className="text-[14px] font-medium border border-surface-200 rounded-full px-4 py-2 text-surface-700 bg-white hover:border-brand-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 cursor-pointer shadow-sm transition-colors"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -94,62 +118,87 @@ export default function HomePage({ onOpenSearch }) {
         </div>
 
         {/* Category filter */}
-        <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-          <CategoryFilter
-            active={activeCategory}
-            onChange={handleCategoryChange}
-          />
+        <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-hide relative z-10">
+          {categories.length > 0 && (
+            <div className="flex items-center gap-2.5 flex-wrap">
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.id)}
+                  className={`text-[13px] font-medium px-5 py-2.5 rounded-full border transition-all duration-300 whitespace-nowrap outline-none
+                    ${activeCategory === cat.id
+                      ? 'bg-surface-900 text-white border-surface-900 shadow-md shadow-surface-900/20'
+                      : 'bg-white text-surface-600 border-surface-200 hover:border-brand-300 hover:text-brand-600 hover:shadow-sm'
+                    }`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div className="border-t border-slate-200 mt-6 mb-8" />
+        <div className="border-t border-surface-200 mt-8 mb-12 relative z-10 opacity-70" />
 
-        {/* Empty state */}
-        {filtered.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-lg font-semibold text-slate-700">No articles found</h3>
-            <p className="text-slate-400 text-sm mt-1">Try a different category.</p>
-            <button
-              onClick={() => handleCategoryChange('all')}
-              className="mt-4 text-sm font-semibold text-blue-600 hover:underline"
-            >
-              Clear filter
-            </button>
+        {loading ? (
+          <div className="flex justify-center py-20 text-brand-500">
+            <Loader2 size={40} className="animate-spin" />
           </div>
-        )}
-
-        {/* Blog grid */}
-        {filtered.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredBlog && visibleCount >= 1 && (
-              <BlogCard key={featuredBlog.id} blog={featuredBlog} featured />
+        ) : (
+          <>
+            {/* Empty state */}
+            {filtered.length === 0 && (
+              <div className="text-center py-24 bg-white/50 backdrop-blur-sm rounded-3xl border border-surface-100 shadow-sm relative z-10">
+                <div className="text-6xl mb-6">🔍</div>
+                <h3 className="text-2xl font-display font-bold text-surface-900">No articles found</h3>
+                <p className="text-surface-500 text-base mt-2 max-w-md mx-auto">We couldn't find anything matching that category. Try selecting another one.</p>
+                <button
+                  onClick={() => handleCategoryChange('all')}
+                  className="mt-6 inline-flex items-center justify-center bg-surface-900 text-white hover:bg-brand-600 font-semibold px-6 py-3 rounded-full transition-colors"
+                >
+                  Clear filters
+                </button>
+              </div>
             )}
-            {visibleRest.map((blog) => (
-              <BlogCard key={blog.id} blog={blog} />
-            ))}
-          </div>
-        )}
 
-        {/* Load more */}
-        {filtered.length > 0 && (
-          <div className="text-center mt-10">
-            {hasMore ? (
-              <button
-                onClick={handleLoadMore}
-                className="inline-flex items-center gap-2 border border-slate-200 bg-white text-slate-600 hover:border-blue-300 hover:text-blue-600 text-sm font-semibold px-6 py-2.5 rounded-full shadow-sm transition"
-              >
-                Load More Articles
-              </button>
-            ) : (
-              <p className="text-sm text-slate-400">
-                All {filtered.length} articles loaded
-              </p>
+            {/* Blog grid */}
+            {filtered.length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
+                {featuredBlog && visibleCount >= 1 && (
+                  <BlogCard key={featuredBlog.id} blog={featuredBlog} featured />
+                )}
+                {visibleRest.map((blog) => (
+                  <BlogCard key={blog.id} blog={blog} />
+                ))}
+              </div>
             )}
-          </div>
+
+            {/* Load more */}
+            {filtered.length > 0 && (
+              <div className="text-center mt-16 relative z-10">
+                {hasMore ? (
+                  <button
+                    onClick={handleLoadMore}
+                    className="inline-flex items-center gap-2 bg-white text-surface-900 border border-surface-200 hover:border-brand-300 hover:text-brand-600 font-semibold text-[15px] px-8 py-3.5 rounded-full shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    Discover More
+                  </button>
+                ) : (
+                  <div className="inline-flex items-center gap-2 bg-surface-50 text-surface-400 font-medium text-[14px] px-6 py-3 rounded-full border border-surface-100">
+                    You've reached the end
+                  </div>
+                )}
+              </div>
+            )}
+          </>
         )}
 
         {/* Newsletter */}
-        {filtered.length > 0 && <NewsletterBanner />}
+        {!loading && filtered.length > 0 && (
+          <div className="mt-24 relative z-10">
+            <NewsletterBanner />
+          </div>
+        )}
       </main>
 
       <Footer />

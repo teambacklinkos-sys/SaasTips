@@ -1,4 +1,4 @@
-import { Mail, ArrowRight } from 'lucide-react';
+import { Mail, ArrowRight, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 import { useModal } from '../context/ModalContext';
 import { useToast } from '../context/ToastContext';
@@ -18,55 +18,51 @@ export default function NewsletterBanner() {
   };
 
   return (
-    <section className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl overflow-hidden shadow-xl shadow-blue-200 my-14">
-      <div className="relative px-8 py-12 text-center">
-        {/* Background blobs */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 pointer-events-none" />
+    <section className="relative overflow-hidden bg-surface-900 rounded-[2.5rem] shadow-2xl my-14 border border-surface-800">
+      {/* Background blobs */}
+      <div className="absolute top-0 right-0 w-[40rem] h-[40rem] bg-brand-500/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-teal-500/10 rounded-full blur-[80px] translate-y-1/3 -translate-x-1/3 pointer-events-none" />
 
-        <div className="relative">
-          <div className="inline-flex items-center gap-2 bg-white/15 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-            <Mail size={13} /> Weekly SaaS Insights
+      <div className="relative px-6 py-16 sm:px-12 sm:py-20 text-center flex flex-col items-center">
+        <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 text-brand-300 text-[11px] uppercase tracking-widest font-semibold px-4 py-1.5 rounded-full mb-6">
+          <Sparkles size={13} className="text-brand-400" /> Weekly SaaS Insights
+        </div>
+        
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-bold text-white mb-4">
+          Join the inner circle of founders
+        </h2>
+        <p className="text-surface-400 text-[16px] sm:text-[18px] max-w-xl mx-auto leading-relaxed">
+          Join 85,000+ founders getting one actionable tip every Tuesday. No fluff, straight to the point.
+        </p>
+
+        {submitted ? (
+          <div className="mt-10 inline-flex items-center gap-2 bg-brand-500 text-white font-semibold text-[15px] px-8 py-4 rounded-full shadow-lg shadow-brand-500/20">
+            You are on the list! Check your inbox.
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
-            Get the best SaaS tips in your inbox
-          </h2>
-          <p className="mt-2 text-blue-100 text-sm sm:text-base max-w-lg mx-auto">
-            Join 12,000+ founders getting one actionable tip every Tuesday. No fluff, unsubscribe anytime.
-          </p>
-
-          {submitted ? (
-            <div className="mt-6 inline-flex items-center gap-2 bg-white text-blue-700 font-semibold text-sm px-6 py-3 rounded-full">
-              You are in! Check your inbox.
-            </div>
-          ) : (
-            <>
-              <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        ) : (
+          <div className="mt-10 w-full max-w-md">
+            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 relative z-10 p-1.5 bg-surface-800/50 backdrop-blur-md rounded-full border border-surface-700 focus-within:border-brand-500/50 transition-colors">
+              <div className="flex-1 flex items-center pl-4 pr-2">
+                <Mail size={18} className="text-surface-500" />
                 <input
                   type="email"
                   required
-                  placeholder="you@company.com"
+                  placeholder="name@company.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="flex-1 px-4 py-3 rounded-full text-sm text-slate-900 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-white"
+                  className="w-full bg-transparent border-none text-white placeholder:text-surface-500 focus:outline-none focus:ring-0 px-3 text-[15px]"
                 />
-                <button
-                  type="submit"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 font-semibold text-sm px-5 py-3 rounded-full hover:bg-blue-50 transition shrink-0"
-                >
-                  Subscribe <ArrowRight size={15} />
-                </button>
-              </form>
+              </div>
               <button
-                onClick={() => openModal('subscribe')}
-                className="mt-3 text-blue-200 text-xs hover:text-white underline underline-offset-2 transition"
+                type="submit"
+                className="inline-flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-[14px] px-6 py-3 rounded-full shadow-lg shadow-brand-500/20 transition-all sm:w-auto w-full"
               >
-                Or subscribe via modal
+                Join Now <ArrowRight size={16} />
               </button>
-            </>
-          )}
-          <p className="mt-3 text-blue-200 text-xs">No spam. Unsubscribe at any time.</p>
-        </div>
+            </form>
+            <p className="mt-4 text-surface-500 text-[12px] font-medium">Join completely free. Unsubscribe any time.</p>
+          </div>
+        )}
       </div>
     </section>
   );

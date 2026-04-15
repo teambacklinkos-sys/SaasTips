@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -10,9 +10,11 @@
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, sans-serif;
-  background-color: #f8fafc;
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  background-color: #FAFAFB;
   color: #1e293b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 #root {
